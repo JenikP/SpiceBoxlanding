@@ -9,6 +9,9 @@ import {
   MapPin,
   Instagram,
 } from "lucide-react";
+import { Star } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card"; // 👈 adjust this path to match your project
+
 import WaitlistForm from "./components/WaitlistForm";
 import { meals } from "./data/meals";
 
