@@ -34,8 +34,8 @@ export default async function handler(req: any, res: any) {
       // client and here in the API; SUPABASE_SERVICE_ROLE_KEY must have
       // administrative privileges since we need to create users.  These must
       // be configured in your Vercel project settings.
-      const supabaseUrl = process.env.VITE_SUPABASE_URL;
-      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const supabaseUrl = process.env.VITE_SUPABASE_URL!;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
       if (!supabaseUrl || !supabaseServiceKey) {
         return res.status(500).json({
