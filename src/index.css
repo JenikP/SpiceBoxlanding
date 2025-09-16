@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for brand colours.  These can be used
+   throughout the app via the `var()` function or to extend
+   Tailwind's configuration. */
+:root {
+  --spice-orange: #f97316;
+  --spice-red: #f43f5e;
+}
+
+html {
+  scroll-behavior: smooth;
+}
