@@ -340,7 +340,7 @@ export default function App() {
             <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl p-8 text-center hover:shadow-xl transition-shadow duration-300">
               <div className="text-6xl mb-6">⚖️</div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Weight Loss Guaranteed
+                Helps With Weight Loss
               </h3>
               <p className="text-gray-600">
                 Scientifically planned meals to help you lose weight while
