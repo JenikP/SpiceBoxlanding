@@ -516,7 +516,7 @@ export default function App() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.instagram.com/spiceboxau/"
                   className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center hover:shadow-lg transition-shadow"
                 >
                   <Instagram className="h-5 w-5 text-white" />
