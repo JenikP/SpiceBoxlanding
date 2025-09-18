@@ -106,7 +106,7 @@ export default function App() {
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                <span>Cancel anytime</span>
+                <span>Authentic taste</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
