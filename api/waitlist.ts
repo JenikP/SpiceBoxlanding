@@ -23,14 +23,35 @@ export default async function handler(req: any, res: any) {
       process.env.SUPABASE_SERVICE_ROLE_KEY! // keep this only in serverless funcs
     );
 
-    const { error } = await supabase.from("profiles").insert({
-      full_name: data.fullName,
+const { error } = await supabase.from("profiles").insert({
+  full_name: data.fullName,
+  email: data.email,
+  phone: data.phone ?? "",
+  suburb: data.suburb,
+  heard_from: data.heardFrom,
+  dietaryPreferance: data.dietaryPreference,
+});
+
+if (error) {
+  console.error("Insert error:", error);
+  return res.status(500).json({ success: false, error: error.message });
+}
+
+// ✅ Call Supabase Edge Function to send email
+await fetch(
+  `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       email: data.email,
-      phone: data.phone ?? "",
-      suburb: data.suburb,
-      heard_from: data.heardFrom,
-      dietaryPreferance: data.dietaryPreference,
-    });
+      name: data.fullName,
+    }),
+  }
+);
+
+return res.status(200).json({ success: true });
+
 
     if (error) {
       console.error("Insert error:", error);
