@@ -32,14 +32,14 @@ const { error } = await supabase.from("profiles").insert({
   dietaryPreferance: data.dietaryPreference,
 });
 
-if (error) {
+if (error !== null) {
   console.error("Insert error:", error);
   return res.status(500).json({ success: false, error: error.message });
 }
 
 // ✅ Call Supabase Edge Function to send email
 await fetch(
-  `https://${process.env.https://xdvckjythzbjqqwqtyiy.supabase.co.functions.supabase.co/send-waitlist-email`,
+  `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`,
   {
     method: "POST",
     headers: { "Content-Type": "application/json" },
