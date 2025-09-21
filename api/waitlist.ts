@@ -69,16 +69,18 @@ const referredBy = req.query?.ref || null;
     const functionUrl = `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`;
 
     await fetch(functionUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-      body: JSON.stringify({
-        email: data.email,
-        name: data.fullName,
-      }),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+  },
+  body: JSON.stringify({
+    email: data.email,
+    name: data.fullName,
+    referralCode,  // 👈 added here
+  }),
+});
+
 
     return res.status(200).json({ success: true });
   } catch (err: any) {
