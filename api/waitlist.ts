@@ -20,10 +20,24 @@ export default async function handler(req: any, res: any) {
 
     const supabase = createClient(
       process.env.VITE_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY! // safe here, server-side only
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Insert into profiles table
+    // ✅ Check for duplicates
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", data.email)
+      .maybeSingle();
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        error: "This email is already registered for the waitlist.",
+      });
+    }
+
+    // Insert new record
     const { error } = await supabase.from("profiles").insert({
       full_name: data.fullName,
       email: data.email,
@@ -38,26 +52,20 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ success: false, error: error.message });
     }
 
-    // ✅ Call Supabase Edge Function securely with Authorization header
+    // Call Edge Function to send confirmation email
     const functionUrl = `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`;
 
-    const emailResp = await fetch(functionUrl, {
+    await fetch(functionUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`, // service role key (server only)
+        "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       },
       body: JSON.stringify({
         email: data.email,
         name: data.fullName,
       }),
     });
-
-    if (!emailResp.ok) {
-      const errData = await emailResp.text();
-      console.error("Email function failed:", errData);
-      return res.status(500).json({ success: false, error: "Email send failed" });
-    }
 
     return res.status(200).json({ success: true });
   } catch (err: any) {
