@@ -39,7 +39,7 @@ export default async function handler(req: any, res: any) {
 
     // ✅ Call Supabase Edge Function to send email
     await fetch(
-      `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`,
+      `https://xdvckjythzbjqqwqtyiy.supabase.co.functions.supabase.co/send-waitlist-email`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
