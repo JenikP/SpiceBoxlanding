@@ -10,11 +10,7 @@ const waitlistSchema = z.object({
   phone: z.string().optional(),
 });
 
-// ✅ Generate a referral code for the new user
-const referralCode = Math.random().toString(36).substring(2, 8);
 
-// ✅ Check if they came with a referral param (?ref=xxxx)
-const referredBy = req.query?.ref || null;
 
 
 export default async function handler(req: any, res: any) {
@@ -29,6 +25,13 @@ export default async function handler(req: any, res: any) {
       process.env.VITE_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+
+    // ✅ Generate a referral code for the new user
+const referralCode = Math.random().toString(36).substring(2, 8);
+
+// ✅ Check if they came with a referral param (?ref=xxxx)
+const referredBy = req.query?.ref || null;
 
     // ✅ Check for duplicates
     const { data: existing } = await supabase
