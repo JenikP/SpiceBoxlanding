@@ -10,6 +10,13 @@ const waitlistSchema = z.object({
   phone: z.string().optional(),
 });
 
+// ✅ Generate a referral code for the new user
+const referralCode = Math.random().toString(36).substring(2, 8);
+
+// ✅ Check if they came with a referral param (?ref=xxxx)
+const referredBy = req.query?.ref || null;
+
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, error: "Method not allowed" });
@@ -38,14 +45,17 @@ export default async function handler(req: any, res: any) {
     }
 
     // Insert new record
-    const { error } = await supabase.from("profiles").insert({
-      full_name: data.fullName,
-      email: data.email,
-      phone: data.phone ?? "",
-      suburb: data.suburb,
-      heard_from: data.heardFrom,
-      dietaryPreferance: data.dietaryPreference,
-    });
+  const { error } = await supabase.from("profiles").insert({
+  full_name: data.fullName,
+  email: data.email,
+  phone: data.phone ?? "",
+  suburb: data.suburb,
+  heard_from: data.heardFrom,
+  dietaryPreferance: data.dietaryPreference,
+  referral_code: referralCode,   // new
+  referred_by: referredBy        // new
+});
+
 
     if (error) {
       console.error("Insert error:", error);
