@@ -20,9 +20,10 @@ export default async function handler(req: any, res: any) {
 
     const supabase = createClient(
       process.env.VITE_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY! // service role key only in serverless funcs
+      process.env.SUPABASE_SERVICE_ROLE_KEY! // safe here, server-side only
     );
 
+    // Insert into profiles table
     const { error } = await supabase.from("profiles").insert({
       full_name: data.fullName,
       email: data.email,
@@ -37,18 +38,26 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ success: false, error: error.message });
     }
 
-    // ✅ Call Supabase Edge Function to send email
-    await fetch(
-      `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || "xdvckjythzbjqqwqtyiy"}.functions.supabase.co/send-waitlist-email`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          name: data.fullName,
-        }),
-      }
-    );
+    // ✅ Call Supabase Edge Function securely with Authorization header
+    const functionUrl = `https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.functions.supabase.co/send-waitlist-email`;
+
+    const emailResp = await fetch(functionUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`, // service role key (server only)
+      },
+      body: JSON.stringify({
+        email: data.email,
+        name: data.fullName,
+      }),
+    });
+
+    if (!emailResp.ok) {
+      const errData = await emailResp.text();
+      console.error("Email function failed:", errData);
+      return res.status(500).json({ success: false, error: "Email send failed" });
+    }
 
     return res.status(200).json({ success: true });
   } catch (err: any) {
