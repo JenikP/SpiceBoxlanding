@@ -6,8 +6,18 @@ import { insertWaitlistSchema } from "@shared/schema";
 
 // Extend schema for form-only fields
 const formSchema = insertWaitlistSchema.extend({
-  currentWeight: z.string().optional(),
-  goalWeight: z.string().optional(),
+  currentWeight: z
+    .string()
+    .optional()
+    .refine((val) => !val || Number(val) >= 40, {
+      message: "Weight must be at least 40kg",
+    }),
+  goalWeight: z
+    .string()
+    .optional()
+    .refine((val) => !val || Number(val) >= 40, {
+      message: "Goal weight must be at least 40kg",
+    }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -127,10 +137,10 @@ export default function WaitlistForm() {
         >
           <option value="">Select your preference</option>
           <option value="vegetarian">Vegetarian</option>
-          <option value="non-vegetarian">Non‑Vegetarian</option>
+          <option value="non-vegetarian">Non-Vegetarian</option>
           <option value="vegan">Vegan</option>
-          <option value="gluten-free">Gluten‑Free</option>
-          <option value="dairy-free">Dairy‑Free</option>
+          <option value="gluten-free">Gluten-Free</option>
+          <option value="dairy-free">Dairy-Free</option>
           <option value="no-preference">No Preference</option>
         </select>
         {errors.dietaryPreference && <p className="text-red-600 text-xs mt-1">{errors.dietaryPreference.message}</p>}
@@ -161,9 +171,12 @@ export default function WaitlistForm() {
             id="currentWeight"
             type="number"
             {...register('currentWeight')}
+            min={40}
+            onWheel={(e) => e.currentTarget.blur()}
             className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500"
             placeholder="e.g. 75"
           />
+          {errors.currentWeight && <p className="text-red-600 text-xs mt-1">{errors.currentWeight.message}</p>}
         </div>
         <div>
           <label htmlFor="goalWeight" className="block text-sm font-semibold text-gray-700 mb-1">Goal Weight (kg)</label>
@@ -171,9 +184,12 @@ export default function WaitlistForm() {
             id="goalWeight"
             type="number"
             {...register('goalWeight')}
+            min={40}
+            onWheel={(e) => e.currentTarget.blur()}
             className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-orange-500"
             placeholder="e.g. 65"
           />
+          {errors.goalWeight && <p className="text-red-600 text-xs mt-1">{errors.goalWeight.message}</p>}
         </div>
       </div>
       <button
