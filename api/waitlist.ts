@@ -8,6 +8,7 @@ const waitlistSchema = z.object({
   dietaryPreference: z.string().min(1, "Please select a dietary preference"),
   heardFrom: z.string().min(1, "Please let us know where you heard about us"),
   phone: z.string().optional(),
+  referredBy: z.string().optional(), // 👈 added
 });
 
 
