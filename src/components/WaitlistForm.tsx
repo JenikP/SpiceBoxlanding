@@ -1,66 +1,78 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { insertWaitlistSchema } from '@shared/schema';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertWaitlistSchema } from "@shared/schema";
 
-// Extend the shared insertWaitlistSchema with optional weight fields used
-// only for display in the form.  These fields are not sent to the API.
+// Extend schema for form-only fields
 const formSchema = insertWaitlistSchema.extend({
   currentWeight: z.string().optional(),
-  goalWeight: z.string().optional()
+  goalWeight: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export default function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [refCode, setRefCode] = useState<string | null>(null);
+
+  // ✅ Grab referral code from URL (?ref=xxxx)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) setRefCode(ref);
+  }, []);
+
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      suburb: '',
-      dietaryPreference: '',
-      heardFrom: '',
-      currentWeight: '',
-      goalWeight: ''
-    }
+      fullName: "",
+      email: "",
+      suburb: "",
+      dietaryPreference: "",
+      heardFrom: "",
+      currentWeight: "",
+      goalWeight: "",
+    },
   });
 
   const onSubmit = async (data: FormData) => {
-    // Exclude the weight fields from the payload sent to the API.
     const { currentWeight, goalWeight, ...payload } = data;
     try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          referredBy: refCode, // 👈 send referral code to backend
+        }),
       });
       const json = await res.json();
       if (res.ok && json.success) {
         setSubmitted(true);
         reset();
       } else {
-        // eslint-disable-next-line no-alert
-        alert(json.error ?? 'Failed to join the waitlist');
+        alert(json.error ?? "Failed to join the waitlist");
       }
     } catch {
-      // eslint-disable-next-line no-alert
-      alert('Network error. Please try again later.');
+      alert("Network error. Please try again later.");
     }
   };
 
   if (submitted) {
     return (
       <div className="text-center space-y-4">
-        <h3 className="text-2xl font-bold text-green-600">You're on the list!</h3>
-        <p className="text-gray-700">Stay tuned for exclusive launch offers and updates.</p>
+        <h3 className="text-2xl font-bold text-green-600">
+          You're on the list!
+        </h3>
+        <p className="text-gray-700">
+          Stay tuned for exclusive launch offers and updates.
+        </p>
         <button
           onClick={() => setSubmitted(false)}
           className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg"
